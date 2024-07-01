@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 public class ColorSelection : MonoBehaviour
 {
@@ -11,23 +12,59 @@ public class ColorSelection : MonoBehaviour
         Blue
     }
 
-    private PlayerColor selectedColor = PlayerColor.Red;  // Color seleccionado inicialmente
+    private PlayerColor selectedColor = PlayerColor.Red;
+    private string savePath;
 
-    // Método para seleccionar un color y asignarlo al botón correspondiente
+    public static ColorSelection Instance { get; private set; }
+
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+            savePath = Application.persistentDataPath + "/colorSelection.json";
+            LoadColorSelection();
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     public void SelectColor(int colorIndex)
     {
         selectedColor = (PlayerColor)colorIndex;
-
-        // Guardar la selección de color en PlayerPrefs
-        PlayerPrefs.SetInt("SelectedColor", (int)selectedColor);
-        PlayerPrefs.Save();
+        SaveColorSelection();
     }
 
-    // Método para obtener el color seleccionado
     public PlayerColor GetSelectedColor()
     {
-        // Obtener el color seleccionado de PlayerPrefs (default: Rojo)
-        int colorIndex = PlayerPrefs.GetInt("SelectedColor", (int)PlayerColor.Red);
-        return (PlayerColor)colorIndex;
+        return selectedColor;
+    }
+
+    void SaveColorSelection()
+    {
+        ColorSelectionData data = new ColorSelectionData();
+        data.selectedColor = selectedColor;
+
+        string jsonData = JsonUtility.ToJson(data);
+        File.WriteAllText(savePath, jsonData);
+    }
+
+    void LoadColorSelection()
+    {
+        if (File.Exists(savePath))
+        {
+            string jsonData = File.ReadAllText(savePath);
+            ColorSelectionData data = JsonUtility.FromJson<ColorSelectionData>(jsonData);
+            selectedColor = data.selectedColor;
+        }
+    }
+
+    [System.Serializable]
+    private class ColorSelectionData
+    {
+        public PlayerColor selectedColor;
     }
 }

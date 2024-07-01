@@ -5,44 +5,24 @@ using UnityEngine;
 public class CanastaControl : MonoBehaviour
 {
     public float speed = 5.0f;  // Velocidad de movimiento de la canasta
+    public Renderer cubeRenderer;  // Referencia al Renderer del cubo
 
-    // Colores disponibles para la canasta
-    public readonly Color colorRojo = Color.red;
-    public readonly Color colorVerde = Color.green;
-    public readonly Color colorAzul = Color.blue;
-
-    void Start()
+   void Start()
     {
-        // Obtener el color seleccionado guardado en PlayerPrefs (default: Rojo)
-        int colorIndex = PlayerPrefs.GetInt("SelectedColor", 0);
-         Debug.Log("Color index from PlayerPrefs: " + colorIndex);
-
-        // Aplicar el color seleccionado a la canasta
-        Renderer renderer = GetComponent<Renderer>();
-        if (renderer != null)
+       ColorSelection.PlayerColor selectedColor = ColorSelection.Instance.GetSelectedColor();
+       switch (selectedColor)
         {
-            switch (colorIndex)
-            {
-                case 0:  // Rojo
-                    renderer.material.color = colorRojo;
-                    break;
-                case 1:  // Verde
-                    renderer.material.color = colorVerde;
-                    break;
-                case 2:  // Azul
-                    renderer.material.color = colorAzul;
-                    break;
-                default:
-                    Debug.LogWarning("Color no reconocido");
-                    break;
-            }
-        }
-        else
-        {
-            Debug.LogError("Renderer component not found on GameObject " + gameObject.name);
+            case ColorSelection.PlayerColor.Red:
+                cubeRenderer.material.color = Color.red;
+                break;
+            case ColorSelection.PlayerColor.Green:
+                cubeRenderer.material.color = Color.green;
+                break;
+            case ColorSelection.PlayerColor.Blue:
+                cubeRenderer.material.color = Color.blue;
+                break;
         }
     }
-
     void Update()
     {
         MoveHorizontal();

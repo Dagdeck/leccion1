@@ -12,6 +12,7 @@ public class ObjetoAtrapado : DestroyObjectsBase
 
     private void Start()
     {
+    
         // Encontrar y obtener una referencia al ScoreManager en la escena
         scoreManager = FindObjectOfType<ScoreManager>();
         
